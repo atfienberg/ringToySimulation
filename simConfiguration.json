@@ -6,7 +6,7 @@
 	"y0": 30
     },
     "detector":{
-	"nPlanes" : 2,
+	"nPlanes" : 45,
 	"fieldIndex" :0.18
     }
     
