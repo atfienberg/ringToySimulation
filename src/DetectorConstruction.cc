@@ -149,7 +149,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   //tracking planes
   G4int nPlanes = 45;
-  G4double planeWidth = 10*mm;
+  G4double planeWidth = .01*mm;
   G4Tubs* solidPlane = new G4Tubs("tPlane", 
 				  0, 
 				  45,
@@ -168,9 +168,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //placement test
   for(int i = 0; i < nPlanes; ++i){
     G4double theta = i * 360.0 * deg / nPlanes;
-
-    //put front of plane at theta, not center
-    theta = theta - std::atan(planeWidth/RINGRADIUS);
+    
     G4RotationMatrix rm = G4RotationMatrix();
     rm.rotateY(90*deg);
     rm.rotateZ(-theta);
@@ -231,14 +229,14 @@ void RingField::GetFieldValue(const G4double Point[4], G4double* Bfield) const{
   Bfield[2] = B0;
   
   //quad fields
-  G4ThreeVector r(Point[0], Point[1], Point[2]);
-  G4double magR = r.mag();
-  G4ThreeVector rHat = r/magR;
-  G4double x = magR - r0;
-  G4ThreeVector xField = quadK * x * rHat;
+  G4ThreeVector rho(Point[0], Point[1], 0);
+  G4double magRho = rho.mag();
+  G4ThreeVector rhoHat = rho/magRho;
+  G4double x = magRho - r0;
+  G4ThreeVector xField = quadK * x * rhoHat;
   Bfield[3] = xField.x();
   Bfield[4] = xField.y();
-  Bfield[5] = -1*quadK * r.z();
+  Bfield[5] = -1*quadK * Point[2];
   
 }
 

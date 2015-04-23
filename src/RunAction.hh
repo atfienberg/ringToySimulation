@@ -23,58 +23,72 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file electromagnetic/TestEm2/src/PrimaryGeneratorAction.cc
-/// \brief Implementation of the PrimaryGeneratorAction class
+/// \file electromagnetic/TestEm2/include/RunAction.hh
+/// \brief Definition of the RunAction class
 //
-// $Id: PrimaryGeneratorAction.cc 83431 2014-08-21 15:49:56Z gcosmo $
+// $Id: RunAction.hh 78550 2014-01-07 09:43:41Z gcosmo $
 //
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "PrimaryGeneratorAction.hh"
+#ifndef RunAction_h
+#define RunAction_h 1
 
-#include "G4Event.hh"
-#include "G4ParticleTable.hh"
-#include "G4ParticleDefinition.hh"
-#include "G4SystemOfUnits.hh"
-#include <cmath>
+#include "G4UserRunAction.hh"
+#include "G4ThreeVector.hh"
+#include "G4Run.hh"
+#include "SimConfiguration.hh"
+#include "TGraph.h"
+#include "TFile.h"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#include <string>
+#include <memory>
 
-PrimaryGeneratorAction::PrimaryGeneratorAction ()
-:G4VUserPrimaryGeneratorAction(), 
- fParticleGun(0)
+class Run : public G4Run{
+public:
+  Run(std::shared_ptr<SimConfiguration> simConf);
+  virtual ~Run();
+  
+  void initializeFile();
+  void beginNewEvent(G4int eventID);
+  void recordEndOfEvent();
+  void closeFile();
+
+  void recordPlaneCrossing(G4int planeNo, G4double t, const G4ThreeVector& position);
+
+private:
+  TFile* file_;
+  TGraph* yGraph_;
+  TGraph* xGraph_;
+  TGraph* thetaGraph_;
+  std::shared_ptr<SimConfiguration> simConf_;
+  G4int zeroCrossings_;
+};
+
+class RunAction : public G4UserRunAction
 {
-  G4int n_particle = 1;
-  fParticleGun  = new G4ParticleGun(n_particle);
+public:
+  
+  RunAction(std::shared_ptr<SimConfiguration> simConf);
+  virtual ~RunAction();
 
-  G4ParticleDefinition* particle
-    = G4ParticleTable::GetParticleTable()->FindParticle("mu+");
-  fParticleGun->SetParticleDefinition(particle);
-  fParticleGun->SetParticlePosition(G4ThreeVector(0,7.112*m+30*mm,30*mm));  
-  G4double gammaMagic = 29.3;
-  G4double pMagic = particle->GetPDGMass()*gammaMagic*std::sqrt(1-1/(gammaMagic*gammaMagic));
-  //  G4double delta = 0.015/7.112*(1-0.18);
-  G4double delta = 0;
-  G4double p = pMagic*(1 + delta);
-  fParticleGun->SetParticleMomentum(G4ThreeVector(p, 0.,0.));
-}
+  virtual G4Run* GenerateRun();  
+  virtual void BeginOfRunAction(const G4Run*);
+  virtual void EndOfRunAction(const G4Run*);
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+private:
+  Run* theRun_;
+  std::shared_ptr<SimConfiguration> simConf_;
+};
 
-PrimaryGeneratorAction::~PrimaryGeneratorAction()
-{
-  delete fParticleGun;
-}
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
-{
-  //this function is called at the begin of event
-  //
-  fParticleGun->GeneratePrimaryVertex(anEvent);
-}
+  
+  
+
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+#endif
 

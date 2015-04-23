@@ -23,58 +23,34 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file electromagnetic/TestEm2/src/PrimaryGeneratorAction.cc
-/// \brief Implementation of the PrimaryGeneratorAction class
+/// \brief Definition of the EventAction class
 //
-// $Id: PrimaryGeneratorAction.cc 83431 2014-08-21 15:49:56Z gcosmo $
+// $Id: EventAction.hh 78550 2014-01-07 09:43:41Z gcosmo $
 //
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "PrimaryGeneratorAction.hh"
+#ifndef EventAction_h
+#define EventAction_h 1
 
-#include "G4Event.hh"
-#include "G4ParticleTable.hh"
-#include "G4ParticleDefinition.hh"
-#include "G4SystemOfUnits.hh"
-#include <cmath>
+#include "G4UserEventAction.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PrimaryGeneratorAction::PrimaryGeneratorAction ()
-:G4VUserPrimaryGeneratorAction(), 
- fParticleGun(0)
+class EventAction : public G4UserEventAction
 {
-  G4int n_particle = 1;
-  fParticleGun  = new G4ParticleGun(n_particle);
+public:
+  
+  EventAction();
+  virtual ~EventAction();
 
-  G4ParticleDefinition* particle
-    = G4ParticleTable::GetParticleTable()->FindParticle("mu+");
-  fParticleGun->SetParticleDefinition(particle);
-  fParticleGun->SetParticlePosition(G4ThreeVector(0,7.112*m+30*mm,30*mm));  
-  G4double gammaMagic = 29.3;
-  G4double pMagic = particle->GetPDGMass()*gammaMagic*std::sqrt(1-1/(gammaMagic*gammaMagic));
-  //  G4double delta = 0.015/7.112*(1-0.18);
-  G4double delta = 0;
-  G4double p = pMagic*(1 + delta);
-  fParticleGun->SetParticleMomentum(G4ThreeVector(p, 0.,0.));
-}
+  virtual void BeginOfEventAction(const G4Event*);
+  virtual void EndOfEventAction(const G4Event*);
+};
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PrimaryGeneratorAction::~PrimaryGeneratorAction()
-{
-  delete fParticleGun;
-}
+#endif
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
-{
-  //this function is called at the begin of event
-  //
-  fParticleGun->GeneratePrimaryVertex(anEvent);
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
+    
