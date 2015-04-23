@@ -55,8 +55,10 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-DetectorConstruction::DetectorConstruction()
-  : G4VUserDetectorConstruction()
+DetectorConstruction::DetectorConstruction(std::shared_ptr<SimConfiguration> simConf)
+  : 
+  G4VUserDetectorConstruction(),
+  simConf_(simConf)
 { }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -148,7 +150,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 
   //tracking planes
-  G4int nPlanes = 45;
+  G4int nPlanes = simConf_->det.nPlanes;
   G4double planeWidth = .01*mm;
   G4Tubs* solidPlane = new G4Tubs("tPlane", 
 				  0, 
@@ -183,7 +185,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   }
 
   //make field
-  RingField* theField = new RingField();
+  RingField* theField = new RingField(simConf_->det.fieldIndex);
   G4EqMagElectricField* eqn = new G4EqMagElectricField(theField);
   G4int nvar = 8;
   G4MagIntegratorStepper* stepper = new G4ClassicalRK4(eqn, nvar);
@@ -212,31 +214,30 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 RingField::~RingField(){
 }
 
-RingField::RingField() 
+RingField::RingField(G4double fieldIndex) 
   :
   G4ElectroMagneticField(),
-  r0(7.112*m)
+  r0_(7.112*m)
 {
-  const double n = 0.18;
   G4double muM = G4ParticleTable::GetParticleTable()->FindParticle("mu+")->GetPDGMass();
-  B0 = muM*29.3*std::sqrt(1-1/(29.3*29.3))/(r0*c_light);
-  quadK = n*c_light*std::sqrt(1-1/(29.3*29.3))*B0/r0;
+  B0_ = muM*29.3*std::sqrt(1-1/(29.3*29.3))/(r0_*c_light);
+  quadK_ = fieldIndex*c_light*std::sqrt(1-1/(29.3*29.3))*B0_/r0_;
 }
 
 void RingField::GetFieldValue(const G4double Point[4], G4double* Bfield) const{
   Bfield[0] = 0;
   Bfield[1] = 0;
-  Bfield[2] = B0;
+  Bfield[2] = B0_;
   
   //quad fields
   G4ThreeVector rho(Point[0], Point[1], 0);
   G4double magRho = rho.mag();
   G4ThreeVector rhoHat = rho/magRho;
-  G4double x = magRho - r0;
-  G4ThreeVector xField = quadK * x * rhoHat;
+  G4double x = magRho - r0_;
+  G4ThreeVector xField = quadK_ * x * rhoHat;
   Bfield[3] = xField.x();
   Bfield[4] = xField.y();
-  Bfield[5] = -1*quadK * Point[2];
+  Bfield[5] = -1*quadK_ * Point[2];
   
 }
 

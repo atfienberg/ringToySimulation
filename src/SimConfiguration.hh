@@ -5,25 +5,15 @@
 #include <vector>
 
 typedef struct{
-  int nRows;
-  int nCols;
-  double width;
-  double height;
-  double length;
-} CalorimeterConfiguration;
-
-typedef struct{
-  std::string particleType;
-  double energy;
-  double posX;
-  double posY;
-  double impactAngle;
-  double impactPhi;
+  double delta;
+  double x0;
+  double y0;
 } GeneratorConfiguration;
 
 typedef struct{
-  bool emExtra;
-} PhysicsConfiguration;
+  int nPlanes;
+  double fieldIndex;
+} DetectorConfiguration;
 
 class SimConfiguration{
 public:
@@ -32,19 +22,15 @@ public:
   
   void update();
   
-  CalorimeterConfiguration calo;
-  std::vector<GeneratorConfiguration> genVector;
-  PhysicsConfiguration phys;
+  GeneratorConfiguration gen;
+  DetectorConfiguration det;
 
-  static const CalorimeterConfiguration defaultCalo;
-  
   static const GeneratorConfiguration defaultGen;
-
-  static const PhysicsConfiguration defaultPhys;
+  static const DetectorConfiguration defaultDet;
 
 private:
   void readConfig();
-  std::string confFile_;		  
+  std::string confFile_;
 };
   
 

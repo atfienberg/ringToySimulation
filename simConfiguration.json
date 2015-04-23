@@ -1,0 +1,14 @@
+{   
+    "generator": 
+    {
+	"delta": 0,
+	"x0": 30,
+	"y0": 30
+    },
+    "detector":{
+	"nPlanes" : 2,
+	"fieldIndex" :0.18
+    }
+    
+}
+    

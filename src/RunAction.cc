@@ -43,7 +43,12 @@ Run::~Run(){
 }
 
 void Run::initializeFile(){
-  std::string fileName = "testOut.root";
+  std::string fileName = Form("outDelta%.2f%s_x0_%.0f_y0_%.0f_n_%.2f.root",
+			      simConf_->gen.delta*100,
+			      "%",
+			      simConf_->gen.x0,
+			      simConf_->gen.y0,
+			      simConf_->det.fieldIndex);
   file_ = new TFile(fileName.c_str(), "recreate");
 }
 
@@ -67,11 +72,10 @@ void Run::recordEndOfEvent(){
 }
 
 void Run::recordPlaneCrossing(G4int planeNo, G4double t, const G4ThreeVector& position){
-  const G4double nPlanes = 45;
   if(planeNo == 0){
     zeroCrossings_ +=1;
   }
-  G4double theta = 360 * deg * ( planeNo / nPlanes + zeroCrossings_);
+  G4double theta = 360 * deg * ( static_cast<double>(planeNo) / simConf_->det.nPlanes + zeroCrossings_);
   G4ThreeVector rho(position.x(), position.y(), 0);
   G4double x = rho.mag() - 7.112*m;
   G4double y = position.z();

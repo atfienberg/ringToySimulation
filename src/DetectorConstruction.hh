@@ -34,6 +34,8 @@
 #include "G4VUserDetectorConstruction.hh"
 #include "G4ElectroMagneticField.hh"
 #include "globals.hh"
+#include "SimConfiguration.hh"
+#include <memory>
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
@@ -42,26 +44,29 @@ class G4LogicalVolume;
 
 class DetectorConstruction : public G4VUserDetectorConstruction
 {
-  public:
-    DetectorConstruction();
-    virtual ~DetectorConstruction();
+public:
+  DetectorConstruction(std::shared_ptr<SimConfiguration> simConf);
+  virtual ~DetectorConstruction();
+  
+  virtual G4VPhysicalVolume* Construct();
 
-    virtual G4VPhysicalVolume* Construct();
-    
+private:
+  std::shared_ptr<SimConfiguration> simConf_;
+
 };
 
 class RingField : public G4ElectroMagneticField
 {
 public:
-  RingField();
+  RingField(G4double fieldIndex);
   virtual ~RingField();
 
   void GetFieldValue(const G4double Point[4], G4double* Bfield) const override;
   G4bool DoesFieldChangeEnergy() const override { return true; }
 private:
-  G4double B0;
-  G4double quadK;
-  G4double r0;
+  G4double B0_;
+  G4double quadK_;
+  G4double r0_;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

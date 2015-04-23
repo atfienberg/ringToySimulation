@@ -68,11 +68,10 @@ int main(int argc,char** argv) {
   // Construct the default run manager
   unique_ptr<G4RunManager> runManager(new G4RunManager);
   
-  auto simConf = std::make_shared<SimConfiguration>();
+  auto simConf = std::make_shared<SimConfiguration>("simConfiguration.json");
 
   //initialization classes
-  //  runManager->SetUserInitialization(new DetectorConstruction(simConf));
-  runManager->SetUserInitialization(new DetectorConstruction());
+  runManager->SetUserInitialization(new DetectorConstruction(simConf));
   runManager->SetUserInitialization(new PhysicsList());
   runManager->SetUserInitialization(new ActionInitialization(simConf));
 

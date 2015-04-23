@@ -51,8 +51,7 @@ ActionInitialization::~ActionInitialization()
 
 void ActionInitialization::Build() const
 {
-  //  SetUserAction(new PrimaryGeneratorAction(simConf_));
-  SetUserAction(new PrimaryGeneratorAction());
+  SetUserAction(new PrimaryGeneratorAction(simConf_));
   SetUserAction(new RunAction(simConf_));
   SetUserAction(new EventAction);
   SetUserAction(new SteppingAction);

@@ -41,9 +41,10 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PrimaryGeneratorAction::PrimaryGeneratorAction ()
+PrimaryGeneratorAction::PrimaryGeneratorAction (std::shared_ptr<SimConfiguration> simConf)
 :G4VUserPrimaryGeneratorAction(), 
- fParticleGun(0)
+ fParticleGun(0),
+ simConf_(simConf)
 {
   G4int n_particle = 1;
   fParticleGun  = new G4ParticleGun(n_particle);
@@ -51,11 +52,12 @@ PrimaryGeneratorAction::PrimaryGeneratorAction ()
   G4ParticleDefinition* particle
     = G4ParticleTable::GetParticleTable()->FindParticle("mu+");
   fParticleGun->SetParticleDefinition(particle);
-  fParticleGun->SetParticlePosition(G4ThreeVector(0,7.112*m+30*mm,30*mm));  
+  fParticleGun->SetParticlePosition(G4ThreeVector(0,
+						  7.112*m+simConf_->gen.x0,
+						  simConf_->gen.y0));  
   G4double gammaMagic = 29.3;
   G4double pMagic = particle->GetPDGMass()*gammaMagic*std::sqrt(1-1/(gammaMagic*gammaMagic));
-  //  G4double delta = 0.015/7.112*(1-0.18);
-  G4double delta = 0;
+  G4double delta = simConf_->gen.delta;
   G4double p = pMagic*(1 + delta);
   fParticleGun->SetParticleMomentum(G4ThreeVector(p, 0.,0.));
 }
