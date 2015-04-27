@@ -135,7 +135,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
                         "ring");         //its name
 
   G4VisAttributes* ringAttr = new G4VisAttributes(G4Colour::White());
-  ringAttr->SetForceWireframe(true);
+  ringAttr->SetForceSolid(true);
   ringAttr->SetVisibility(true);
   logicRing->SetVisAttributes(ringAttr);
 
@@ -152,12 +152,14 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //tracking planes
   G4int nPlanes = simConf_->det.nPlanes;
   G4double planeWidth = .01*mm;
-  G4Tubs* solidPlane = new G4Tubs("tPlane", 
-				  0, 
-				  45,
-				  planeWidth,
-				  0,
-				  360*deg);
+
+  G4Torus* solidPlane = new G4Torus("tPlane",
+				    0, 
+				    TUBERADIUS,
+				    RINGRADIUS,
+				    -planeWidth/RINGRADIUS,
+				    planeWidth/RINGRADIUS);
+
   G4LogicalVolume* logicPlane =
     new G4LogicalVolume(solidPlane, 
 			world_mat,
@@ -169,12 +171,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   
   //placement test
   for(int i = 0; i < nPlanes; ++i){
-    G4double theta = i * 360.0 * deg / nPlanes;
+    G4double theta = -i * 360.0 * deg / nPlanes + 90*deg;
     
     G4RotationMatrix rm = G4RotationMatrix();
-    rm.rotateY(90*deg);
-    rm.rotateZ(-theta);
-    G4ThreeVector planePos(RINGRADIUS*std::sin(theta), RINGRADIUS*std::cos(theta), 0);
+    rm.rotateZ(theta);
+    //    G4ThreeVector planePos(RINGRADIUS*std::sin(theta), RINGRADIUS*std::cos(theta), 0);
+    G4ThreeVector planePos(0, 0, 0);
     new G4PVPlacement(G4Transform3D(rm, planePos),
 		      logicPlane,
 		      "tPlane",
@@ -189,7 +191,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4EqMagElectricField* eqn = new G4EqMagElectricField(theField);
   G4int nvar = 8;
   G4MagIntegratorStepper* stepper = new G4ClassicalRK4(eqn, nvar);
-  //G4FieldManager* manager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
+
   G4FieldManager* manager = new G4FieldManager();
   manager->SetDetectorField(theField);
   G4double minStep = 0.01*mm;
