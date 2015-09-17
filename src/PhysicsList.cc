@@ -54,7 +54,7 @@ PhysicsList::PhysicsList()
 
   // EM physics
   fEmPhysicsList = new G4EmStandardPhysics();
-  fDecay = new G4DecayPhysics();
+  //fDecay = new G4DecayPhysics();
   
   G4LossTableManager::Instance();
   SetDefaultCutValue(1*mm);  
@@ -65,7 +65,7 @@ PhysicsList::PhysicsList()
 PhysicsList::~PhysicsList()
 {
   delete fEmPhysicsList;
-  delete fDecay;
+  //delete fDecay;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

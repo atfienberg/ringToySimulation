@@ -169,13 +169,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   planeAttr->SetForceSolid(true);
   logicPlane->SetVisAttributes(planeAttr);
   
-  //placement test
+  //placement 
   for(int i = 0; i < nPlanes; ++i){
     G4double theta = -i * 360.0 * deg / nPlanes + 90*deg;
     
     G4RotationMatrix rm = G4RotationMatrix();
     rm.rotateZ(theta);
-    //    G4ThreeVector planePos(RINGRADIUS*std::sin(theta), RINGRADIUS*std::cos(theta), 0);
     G4ThreeVector planePos(0, 0, 0);
     new G4PVPlacement(G4Transform3D(rm, planePos),
 		      logicPlane,
@@ -186,9 +185,13 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 		      checkOverlaps);
   }
 
+  
+  //Spin equations: G4EqEMFieldWithSpin
+
   //make field
   RingField* theField = new RingField(simConf_->det.fieldIndex);
   G4EqMagElectricField* eqn = new G4EqMagElectricField(theField);
+  //this must be 12 for spin tracking
   G4int nvar = 8;
   G4MagIntegratorStepper* stepper = new G4ClassicalRK4(eqn, nvar);
 
